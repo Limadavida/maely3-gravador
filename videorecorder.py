@@ -1,10 +1,22 @@
-#1 exiba se eu quiser pra eu calibrar ok
-#2 grave apenas o sensor
-#3 formate o video com a data atual
-#5 se audit==true, recorte videos salvos e coloque em outra pasta
+#1 exiba se eu quiser pra eu calibrar 
+#2 grave apenas o sensor -> ok
+#3 formate o video com a data atual -> ok
+#5 se audit==true, recorte videos salvos e coloque em outra pasta -> ok
+#6 exiba dimensoes, fps, timestamp, nome do arquivo
+#7 erros leves == log, erros criticos == email
 
-### video recorder function ###
+### tempo minimo de gravacao em FPS ###
+def flag_videowrite(set_videowriterfps, set_videoduration, amount_frames):
+    minutes_in_seconds = set_videoduration * 60
+    flag_amount_frames = set_videowriterfps * minutes_in_seconds
+    min_qtdframes = flag_amount_frames
 
+    if amount_frames <= min_qtdframes:
+        print("error critico tempo gravado menor q 5minutes", flag_amount_frames)
+
+
+
+#flag_videowrite(set_videowriterfps=60, set_videoduration=5, amount_frames=990)
 
 ### time ###
 def timenow():
@@ -12,6 +24,17 @@ def timenow():
     date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return date_time
 
+### display ###
+def display_sensor():
+    pass
+
+### log ###
+import csv
+
+def register_log(csv_path, log, logtime):
+    with open(csv_path, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([log, logtime])
 
 
 ### read config file ###
@@ -20,17 +43,20 @@ from configparser import ConfigParser
 parser = ConfigParser()
 parser.read("config.cfg")
 
+audit = parser.getboolean("interface", "audit")
+private_mode = parser.getboolean("interface", "private_mode")
+
 cam = parser.get("config", "cam")
-private = parser.getboolean("config", "private")
-path_videorecorder = parser.get("config", "path_videorecorder")
+path_videorecorder = parser.get("config", "path_video_recorder")
 delayfps = parser.getint("config", "delayfps")
-videowriterfps = parser.getint("config", "videowriterfps")
+videowriterfps = parser.getint("config", "video_writer_fps")
+videoduration_minutes = parser.getint("config", "video_duration_minutes")
 
+x = parser.getint("sensor", "x")
+size_sensor_width = parser.getint("sensor", "size_sensor_width")
+y = parser.getint("sensor", "y")
+size_sensor_height = parser.getint("sensor", "size_sensor_height")
 
-sensory = parser.getint("sensor", "y")
-sensorh = parser.getint("sensor", "h")
-sensorx = parser.getint("sensor", "x")
-sensorw = parser.getint("sensor", "w")
 
 
 ### relative path ###
@@ -62,105 +88,61 @@ else:
 cap = cv2.VideoCapture(cam)
 
 if (cap.isOpened()== False): 
-  print("Error opening video stream or file")
+    #flag video out
+  print("Error critico opening video stream or file")
 
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
-frame_size = (frame_width,frame_height)
 
-sensor_width = sensory+sensorh
-sensor_height = sensorx+sensorw
-sensor_size = (sensor_width, sensor_height)
+#out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, sensor_size)
+timepath = timenow()
+dirvideosave = dir_videosave + f"/{timepath}" + ".mp4"
 
-out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, sensor_size)
+sensor_height = size_sensor_height - y
+sensor_width = size_sensor_width - x
 
-cap.set(3,300)
-cap.set(4,300)
-cap.set(15, 0.1)
+out = cv2.VideoWriter(dirvideosave, cv2.VideoWriter_fourcc('M','J','P','G'), videowriterfps, (sensor_width, sensor_height))
+
+
+print(videowriterfps)
+#cap.set(3,300)
+#cap.set(4,300)
+#cap.set(15, 0.1)
 
 print("width={}".format(cap.get(3)))
 print("height={}".format(cap.get(4)))
-print("exposure={}".format(cap.get(15)))
+#print("exposure={}".format(cap.get(15)))
 
 
 fps = cap.get(cv2.CAP_PROP_FPS)
-print(fps)
+#print(fps)
 
+qtdframes = 0
 while(cap.isOpened()):
     ret, frame = cap.read()
     if ret == True:
-        #sensor_width = sensory+sensorh
-        #sensor_height = sensorx+sensorw
-        videocrop = frame[sensory:sensor_width, sensorx:sensor_height]
-
+        videocrop = frame[y : size_sensor_height, x : size_sensor_width]
+        
+        qtdframes += 1
         out.write(videocrop)
 
-
-        if not private:
-            print("running in private_mode")
+        #if not private:
+            #print("running in private_mode")
+        if not private_mode:
             cv2.imshow('original', frame) 
             cv2.imshow('sensor', videocrop) 
-        
-
+            
         if cv2.waitKey(delayfps) == 27:
             break
 
-        now = timenow()
-        dirvideosave = dir_videosave + f"/{now}"
-        print(dirvideosave)
-        #write_video(dirvideosave, dirvideosave, videocrop, videowriterfps)
-        #initializeVideoWriter(dirvideosave=dirvideosave, video_width=width, video_height=height, videoStream=frame, fps=fps)
-        outputVideoPath = "videos/1" + ".mp4"
-
-        #sourceVideofps = videoStream.get(cv2.CAP_PROP_FPS)
-        sourceVideofps = fps
-        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-
-        #cv2.VideoWriter("videos/2" + ".mp4", fourcc, fps, frame_size, True)
-    
 
     else: 
         print(f"Break the loop if ret is false, ret={ret}")
         break
 
+print(f"motante de frames {qtdframes}")
+flag_videowrite(set_videowriterfps=videowriterfps, set_videoduration=videoduration_minutes, amount_frames=qtdframes)
 cap.release()
 out.release()
 cv2.destroyAllWindows()
 
-
-'''
-def initializeVideoWriter(video_width, video_height, videoStream):
-    #outputVideoPath = "audit/auditoria.avi"
-    outputVideoPath = f"audit/auditoria{number_random}.avi"
-    sourceVideofps = videoStream.get(cv2.CAP_PROP_FPS)
-    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-    return cv2.VideoWriter(outputVideoPath, fourcc, sourceVideofps,
-                           (video_width, video_height), True)
-
-
-    #outputVideoPath = "audit/auditoria.avi"
-    outputVideoPath = f"audit/auditoria{number_random}.avi"
-    sourceVideofps = videoStream.get(cv2.CAP_PROP_FPS)
-    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-    return cv2.VideoWriter(outputVideoPath, fourcc, sourceVideofps,
-                           (video_width, video_height), True)
------
-
-def write_video(file_path, frames, fps):
-    """
-    Writes frames to an mp4 video file
-    :param file_path: Path to output video, must end with .mp4
-    :param frames: List of PIL.Image objects
-    :param fps: Desired frame rate
-    """
-
-    w, h = frames[0].size
-    fourcc = cv.VideoWriter_fourcc('m', 'p', '4', 'v')
-    writer = cv.VideoWriter(file_path, fourcc, fps, (w, h))
-
-    for frame in frames:
-        writer.write(pil_to_cv(frame))
-
-    writer.release() 
-
-'''

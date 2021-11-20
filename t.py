@@ -2,7 +2,7 @@ import cv2
 
 
 #capture from camera at location 0
-cap = cv2.VideoCapture(0git )
+cap = cv2.VideoCapture("http://192.168.100.205:8080/video")
 #set the width and height, and UNSUCCESSFULLY set the exposure time
 cap.set(3,500)
 cap.set(4,500)
@@ -12,6 +12,8 @@ while True:
     ret, img = cap.read()
     cv2.imshow("input", img)
     #cv2.imshow("thresholded", imgray*thresh2)
+
+    
 
     key = cv2.waitKey(10)
     if key == 27:

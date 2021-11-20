@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Create a VideoCapture object
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("http://192.168.100.205:8080/video")
 
 # Check if camera opened successfully
 if (cap.isOpened() == False): 
@@ -14,18 +14,20 @@ frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
-out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+out = cv2.VideoWriter('casa.mp4',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (500,500))
 
 while(True):
   ret, frame = cap.read()
 
   if ret == True: 
     
+    videocrop = frame[0:500, 0:500]
     # Write the frame into the file 'output.avi'
-    out.write(frame)
+    out.write(videocrop)
 
     # Display the resulting frame    
-    cv2.imshow('frame',frame)
+    cv2.imshow('d',frame)
+    cv2.imshow('frame',videocrop)
 
     # Press Q on keyboard to stop recording
     if cv2.waitKey(1) & 0xFF == ord('q'):
