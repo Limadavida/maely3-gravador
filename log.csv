@@ -1,0 +1,6 @@
+[Video Capture ERROR] no /home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:28:46.mp4,2021-11-20 01:28:46
+"[Time Video Writer ERROR]-/home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:36:38.mp4, videowriter time is less than desired - amount_frames:990, min_qtdframes36000",2021-11-20 01:36:38
+"[Time Video Writer ERROR]-/home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:40:16.mp4, videowriter time is less than desired - amount_frames:135, min_qtdframes36000",2021-11-20 01:40:16
+"[Time Video Writer ERROR]-/home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:42:03.mp4, videowriter time is less than desired - amount_frames:170, min_qtdframes36000",2021-11-20 01:42:03
+"[Time Video Writer ERROR]-/home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:42:29.mp4, videowriter time is less than desired - amount_frames:990, min_qtdframes36000",2021-11-20 01:42:29
+"[Time Video Writer ERROR]-/home/davidlima/workspace_puko/rdbtec/maely-v3/video-recorder/videos/2021-11-20 01:55:33.mp4, videowriter time is less than desired - amount_frames:183, min_qtdframes36000",2021-11-20 01:55:33
