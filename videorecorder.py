@@ -83,6 +83,7 @@ def display_sensor(sensorframe, original_dimensions, sensor_dimensions, fps, tim
 
 ### automatic audit videos ###
 def automatic_audit():
+
     pass
 
 
@@ -103,7 +104,6 @@ parser.read("config.cfg")
 
 audit = parser.getboolean("interface", "audit")
 private_mode = parser.getboolean("interface", "private_mode")
-audit_date = parser.get("interface", "audit_date")
 audit_duration_minutes = parser.getint("interface", "audit_duration_minutes")
 
 
